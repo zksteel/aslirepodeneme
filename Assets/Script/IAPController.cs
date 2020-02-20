@@ -17,6 +17,7 @@ public class IAPController : MonoBehaviour, IStoreListener
     public static string productAbone3 = "aboneol3";
     private static string productAbone4 = "abone4ol";
     
+
     void Awake()
     {
         Instance = this;
@@ -28,6 +29,7 @@ public class IAPController : MonoBehaviour, IStoreListener
             InitializePurchasing();
         }
     }
+  
 
     public void InitializePurchasing()
     {
@@ -45,19 +47,11 @@ public class IAPController : MonoBehaviour, IStoreListener
         builder.AddProduct(productAbone4, ProductType.Subscription);
         UnityPurchasing.Initialize(this, builder);
     }
-
     private bool IsInitialized()
     {
         return m_StoreController != null && m_StoreExtensionProvider != null;
     }
-
-    /* public void BuyConsumable()
-    {
-        BuyProductID(kProductIDConsumable);
-    }*/
-
     
-
     public void BuySubscription1()
     {
         BuyProductID(productAbone1);
@@ -122,9 +116,40 @@ public class IAPController : MonoBehaviour, IStoreListener
 
     public void OnInitialized(IStoreController controller, IExtensionProvider extensions)
     {
+       // Purchasing has succeeded initializing. Collect our Purchasing references.
         Debug.Log("OnInitialized: PASS");
+        // Overall Purchasing system, configured with products for this application.
         m_StoreController = controller;
+        // Store specific subsystem, for accessing device-specific store features.
         m_StoreExtensionProvider = extensions;
+        //This can be called anytime after initialization
+        //And it should probably be limited to Google Play and not just Android
+#if !UNITY_EDITOR
+        foreach (Product p in controller.products.all)
+        {
+            // Refering to the extra GooglePurchaseData class provided
+            GooglePurchaseData data = new GooglePurchaseData(p.receipt);
+            if (p.hasReceipt)
+            {
+                // Allows you to easily refer to data from the receipt for the subscription,
+                // if AutoRenewing is true, then their subscrition is active.
+                Debug.Log("autoRenewing: "+data.json.autoRenewing);
+                if (data.json.autoRenewing == "true")
+                {
+                    Data.isSubscriber = true;
+                    Badge.init();
+                    db_connect.ClosePaywall();
+                }
+                Debug.Log(data.json.orderId);
+                Debug.Log(data.json.packageName);
+                Debug.Log(data.json.productId);
+                Debug.Log(data.json.purchaseTime);
+                Debug.Log(data.json.purchaseState);
+                Debug.Log(data.json.purchaseToken);
+            }
+        }
+#endif
+
     }
 
     public void OnInitializeFailed(InitializationFailureReason error)
@@ -161,5 +186,9 @@ public class IAPController : MonoBehaviour, IStoreListener
         Debug.Log(string.Format("OnPurchaseFailed: FAIL. Product: '{0}', PurchaseFailureReason: {1}", product.definition.storeSpecificId, failureReason));
     }
 
-}
 
+
+   
+  
+ 
+}
