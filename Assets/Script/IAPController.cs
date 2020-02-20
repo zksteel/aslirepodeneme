@@ -13,9 +13,9 @@ public class IAPController : MonoBehaviour, IStoreListener
 
     // specific mapping to Unity Purchasing's AddProduct, below.
     public static string productAbone1 = "aboneol1";
-    public static string productAbone2 = "aboneol2";
+    public static string productAbone2 = "abone2ol";
     public static string productAbone3 = "aboneol3";
-    private static string productAbone4 = "aboneol4";
+    private static string productAbone4 = "abone4ol";
     
     void Awake()
     {
@@ -41,8 +41,8 @@ public class IAPController : MonoBehaviour, IStoreListener
         var builder = ConfigurationBuilder.Instance(StandardPurchasingModule.Instance());
         builder.AddProduct(productAbone1, ProductType.Subscription);
         builder.AddProduct(productAbone2, ProductType.Subscription);
-        builder.AddProduct(productAbone3, ProductType.Consumable);
-        builder.AddProduct(productAbone4, ProductType.Consumable);
+        builder.AddProduct(productAbone3, ProductType.Subscription);
+        builder.AddProduct(productAbone4, ProductType.Subscription);
         UnityPurchasing.Initialize(this, builder);
     }
 
